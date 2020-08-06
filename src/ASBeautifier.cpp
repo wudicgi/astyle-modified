@@ -1294,10 +1294,22 @@ void ASBeautifier::registerContinuationIndent(const string& line, int i, int spa
 	// indent with the continuation indent
 	if (nextNonWSChar == remainingCharNum || shouldIndentAfterParen)
 	{
+		// added by Wudi
+		bool noDuplicatedIndentForFirstParen = updateParenStack
+				&& !continuationIndentStack->empty()
+				&& parenIndentStack->empty();
+
 		int previousIndent = spaceIndentCount_;
 		if (!continuationIndentStack->empty())
 			previousIndent = continuationIndentStack->back();
+
 		int currIndent = continuationIndent * indentLength + previousIndent;
+
+		// added by Wudi
+		if (noDuplicatedIndentForFirstParen) {
+			currIndent = previousIndent;
+		}
+
 		if (currIndent > maxContinuationIndent && line[i] != '{')
 			currIndent = indentLength * 2 + spaceIndentCount_;
 		continuationIndentStack->emplace_back(currIndent);
@@ -2825,7 +2837,7 @@ void ASBeautifier::parseCurrentLine(const string& line)
 				if (currentHeader != nullptr)
 					registerContinuationIndent(line, i, spaceIndentCount, tabIncrementIn, minConditionalIndent, true);
 				else if (!isInObjCMethodDefinition)
-					registerContinuationIndent(line, i, spaceIndentCount, tabIncrementIn, 0, true);
+					registerContinuationIndent(line, i, spaceIndentCount, tabIncrementIn, 0, true); // mark 02
 			}
 			else if (ch == ')' || ch == ']')
 			{
@@ -3732,7 +3744,7 @@ void ASBeautifier::parseCurrentLine(const string& line)
 					{
 						if (i == 0 && spaceIndentCount == 0)
 							spaceIndentCount += indentLength;
-						registerContinuationIndent(line, i, spaceIndentCount, tabIncrementIn, 0, false);
+						registerContinuationIndent(line, i, spaceIndentCount, tabIncrementIn, 0, false);    // mark 01
 						isContinuation = true;
 					}
 				}
