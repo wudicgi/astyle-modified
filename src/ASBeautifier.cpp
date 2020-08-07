@@ -1295,9 +1295,10 @@ void ASBeautifier::registerContinuationIndent(const string& line, int i, int spa
 	if (nextNonWSChar == remainingCharNum || shouldIndentAfterParen)
 	{
 		// added by Wudi
-		bool noDuplicatedIndentForFirstParen = updateParenStack
-				&& !continuationIndentStack->empty()
-				&& parenIndentStack->empty();
+		bool noDuplicatedIndentForFirstParen = updateParenStack	// current indentation is for opening paren '('
+				&& !continuationIndentStack->empty()			// previously indented for an assignment '='
+				&& parenIndentStack->empty()					// current '(' is the first opening paren needs to add indentation
+				&& (i != 0);									// current '(' must not be the first char, otherwise there is no '=' ahead
 
 		int previousIndent = spaceIndentCount_;
 		if (!continuationIndentStack->empty())
